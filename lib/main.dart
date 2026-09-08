@@ -11,187 +11,217 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Tiered Pricing Card',
-      home: const PricingPage(),
+      title: 'Aplikasi Katalog',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const HomeScreen(), // Screen 1
     );
   }
 }
 
-class PricingPage extends StatelessWidget {
-  const PricingPage({super.key});
+// SCREEN 1: BERANDA
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
+  final List<Map<String, String>> catalogData = const [
+    {
+      'title': 'Paket Dasar',
+      'price': 'Rp 1.500.000',
+      'description': 'Layanan standar cocok untuk usaha pemula atau UMKM.',
+    },
+    {
+      'title': 'Paket Profesional',
+      'price': 'Rp 5.000.000',
+      'description':
+          'Solusi IT profesional lengkap dengan UI/UX custom dan database.',
+    },
+    {
+      'title': 'Paket Enterprise',
+      'price': 'Rp 12.000.000',
+      'description': 'Sistem skala besar dengan dukungan teknis 24/7 dan perawatan berkala.',
+    },
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[200],
       appBar: AppBar(
-        title: const Text('Layanan IT'),
+        title: const Text('Katalog Layanan IT'),
         backgroundColor: Colors.blue[800],
         foregroundColor: Colors.white,
         centerTitle: true,
       ),
-      body: Center(
-        child: Container(
-          width: 300,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black26,
-                blurRadius: 10,
-                offset: Offset(0, 5),
+      body: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: catalogData.length, // Menampilkan 3 cards
+        itemBuilder: (context, index) {
+          final item = catalogData[index];
+          return Card(
+            margin: const EdgeInsets.only(bottom: 16),
+            elevation: 4,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: ListTile(
+              contentPadding: const EdgeInsets.all(16),
+              leading: const Icon(
+                Icons.laptop_mac,
+                size: 40,
+                color: Colors.blue,
               ),
-            ],
-          ),
+              title: Text(
+                item['title']!,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+              subtitle: Text(item['price']!),
+              trailing: const Icon(Icons.arrow_forward_ios),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DetailScreen(
+                      title: item['title']!,
+                      price: item['price']!,
+                      description: item['description']!,
+                    ),
+                  ),
+                );
+              },
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
 
-          // Stack digunakan sebagai kerangka utama
-          child: Stack(
-            children: [
-              // Isi utama kartu
-              Column(
-                mainAxisSize: MainAxisSize.min,
+// SCREEN 2: DETAIL KATALOG (StatefulWidget)
+class DetailScreen extends StatefulWidget {
+  final String title;
+  final String price;
+  final String description;
+
+  const DetailScreen({
+    super.key,
+    required this.title,
+    required this.price,
+    required this.description,
+  });
+
+  @override
+  State<DetailScreen> createState() => _DetailScreenState();
+}
+
+class _DetailScreenState extends State<DetailScreen> {
+  bool isSelected = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Detail Katalog'),
+        backgroundColor: Colors.blue[800],
+        foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context); // Kembali ke Screen 1
+          },
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Column(
                 children: [
-                  // Icon layanan
-                  const Icon(Icons.laptop_mac, size: 60, color: Colors.blue),
-
+                  const Icon(Icons.laptop_mac, size: 80, color: Colors.blue),
                   const SizedBox(height: 10),
-
-                  // Nama paket
-                  const Text(
-                    'Paket Profesional',
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  Text(
+                    widget.title,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-
                   const SizedBox(height: 5),
-
-                  // Deskripsi
-                  const Text(
-                    'Solusi IT profesional untuk kebutuhan bisnis Anda.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Harga dan durasi
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.baseline,
-                    textBaseline: TextBaseline.alphabetic,
-                    children: const [
-                      Text(
-                        'Rp 5.000.000',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue,
-                        ),
-                      ),
-                      SizedBox(width: 5),
-                      Text(
-                        '/ proyek',
-                        style: TextStyle(fontSize: 14, color: Colors.grey),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Daftar fitur
-                  Column(
-                    children: const [
-                      Row(
-                        children: [
-                          Icon(Icons.check, color: Colors.green, size: 20),
-                          SizedBox(width: 8),
-                          Text('Desain UI/UX Khusus'),
-                        ],
-                      ),
-
-                      SizedBox(height: 10),
-
-                      Row(
-                        children: [
-                          Icon(Icons.check, color: Colors.green, size: 20),
-                          SizedBox(width: 8),
-                          Text('Setup Database'),
-                        ],
-                      ),
-
-                      SizedBox(height: 10),
-
-                      Row(
-                        children: [
-                          Icon(Icons.check, color: Colors.green, size: 20),
-                          SizedBox(width: 8),
-                          Text('Dukungan Teknis'),
-                        ],
-                      ),
-
-                      SizedBox(height: 10),
-
-                      Row(
-                        children: [
-                          Icon(Icons.check, color: Colors.green, size: 20),
-                          SizedBox(width: 8),
-                          Text('Maintenance Sistem'),
-                        ],
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 25),
-
-                  // Tombol
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        // Aksi ketika tombol ditekan
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      child: const Text(
-                        'Pilih Paket',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                  Text(
+                    widget.price,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      color: Colors.blue,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
               ),
+            ),
+            const SizedBox(height: 25),
 
-              // Badge menggunakan Positioned
-              Positioned(
-                top: 0,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 5,
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE3F2FD),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.blue.shade200),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Deskripsi Paket:',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
-                  decoration: BoxDecoration(
-                    color: Colors.amber,
+                  const SizedBox(height: 8),
+                  Text(
+                    widget.description,
+                    style: const TextStyle(fontSize: 14, color: Colors.black80),
+                  ),
+                ],
+              ),
+            ),
+            const Spacer(),
+
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    isSelected = !isSelected;
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: isSelected ? Colors.green : Colors.blue,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Text(
-                    'Rekomendasi',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      isSelected ? Icons.check_circle : Icons.add_shopping_cart,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      isSelected ? 'Paket Dipilih!' : 'Pilih Paket Ini',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
